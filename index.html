@@ -1,741 +1,328 @@
-<title>Buscador</title>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProspectGreen — Reduza a conta de energia da sua empresa</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
   :root {
-    --paper: #F4F6F3;
-    --paper-raised: #FFFFFF;
-    --ink: #16241F;
-    --ink-soft: #5B6B62;
-    --accent: #1F6F54;
-    --accent-strong: #154F3C;
-    --accent-soft: #DCE8E1;
-    --line: #C9D0CA;
-    --line-soft: #DEE3DE;
-    --warn-bg: #FBF1E4;
-    --warn-ink: #7A5218;
-    --shadow: 0 1px 0 rgba(22,36,31,0.06);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #0E1613;
-      --paper-raised: #142019;
-      --ink: #E8ECE9;
-      --ink-soft: #93A199;
-      --accent: #4FA980;
-      --accent-strong: #6EC49B;
-      --accent-soft: #1C3227;
-      --line: #263029;
-      --line-soft: #1D2620;
-      --warn-bg: #2A2113;
-      --warn-ink: #E4C989;
-      --shadow: 0 1px 0 rgba(0,0,0,0.3);
-    }
-  }
-  :root[data-theme="dark"] {
-    --paper: #0E1613;
-    --paper-raised: #142019;
-    --ink: #E8ECE9;
-    --ink-soft: #93A199;
-    --accent: #4FA980;
-    --accent-strong: #6EC49B;
-    --accent-soft: #1C3227;
-    --line: #263029;
-    --line-soft: #1D2620;
-    --warn-bg: #2A2113;
-    --warn-ink: #E4C989;
-    --shadow: 0 1px 0 rgba(0,0,0,0.3);
+    --bg: #39FF14;
+    --ink: #000000;
+    --ink-soft: rgba(0,0,0,0.85);
+    --card-bg: rgba(0,0,0,0.06);
+    --card-border: #000000;
+    --divider: rgba(0,0,0,0.25);
   }
 
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
-    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
-    font-size: 16px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
-  ::selection { background: var(--accent-soft); }
-
-  a { color: var(--accent-strong); }
-  a:focus-visible, button:focus-visible, .btn:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
+  a { color: var(--ink); }
+  a:hover { opacity: 0.6; }
+  a:focus-visible, button:focus-visible, .input:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
   }
 
-  h1, h2, h3 {
-    font-family: 'Fraunces', Georgia, serif;
-    font-weight: 500;
-    text-wrap: balance;
-    margin: 0;
-    color: var(--ink);
-  }
+  .wrap { max-width: 1280px; margin: 0 auto; }
 
-  .mono {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
-    font-variant-numeric: tabular-nums;
-  }
+  .pg-rule { height: 1px; border: 0; margin: 0; background: var(--ink); opacity: 0.25; }
+  .pg-kicker { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 10px; font-weight: 700; }
 
-  .wrap {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 28px;
-  }
-
-  .eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12.5px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent-strong);
-  }
-
-  .rule {
-    border: none;
-    border-top: 1px solid var(--line);
-    margin: 0;
-  }
-
-  /* Header */
-  header.site {
-    border-bottom: 1px solid var(--line);
-    position: sticky;
-    top: 0;
-    background: var(--paper);
-    z-index: 10;
-  }
-  .site-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 0;
-    gap: 24px;
-  }
-  .logo {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    font-family: 'Fraunces', serif;
-    font-size: 21px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .logo .mark {
-    width: 10px; height: 10px;
-    border: 1.5px solid var(--ink);
-    border-radius: 2px;
-    display: inline-block;
-    position: relative;
-    top: -1px;
-  }
-  .logo .mark::after {
-    content: "";
-    position: absolute;
-    inset: 2px;
-    background: var(--accent);
-    border-radius: 1px;
-  }
-  nav.links {
-    display: flex;
-    gap: 28px;
-    font-size: 14.5px;
-  }
-  nav.links a { color: var(--ink-soft); text-decoration: none; }
-  nav.links a:hover { color: var(--ink); }
-  .nav-actions { display: flex; align-items: center; gap: 16px; }
-  .nav-actions .btn { padding: 9px 18px; font-size: 14px; }
-
-  @media (max-width: 720px) {
-    nav.links { display: none; }
-  }
-
-  /* Buttons */
   .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 13px 24px;
-    border-radius: 3px;
-    font-size: 15px;
-    font-weight: 500;
-    text-decoration: none;
-    border: 1px solid transparent;
-    cursor: pointer;
-    font-family: 'IBM Plex Sans', sans-serif;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer; text-decoration: none; font-weight: 600; font-size: 14px;
+    color: var(--ink); background: transparent; border: 2px solid var(--ink);
+    padding: 12px 20px; border-radius: 4px; font-family: inherit;
   }
-  .btn-primary {
-    background: var(--accent-strong);
-    color: #F4F6F3;
+  .btn:hover { background: rgba(0,0,0,0.08); }
+  .btn-ghost { border-color: transparent; text-decoration: underline; }
+
+  .card {
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 4px;
+    padding: 18px; display: flex; flex-direction: column; gap: 8px;
   }
-  .btn-primary:hover { background: var(--accent); }
-  .btn-ghost {
-    background: transparent;
-    border-color: var(--line);
-    color: var(--ink);
+  .card-title { font-weight: 700; font-size: 15px; margin: 0; }
+  .card-body { margin: 0; font-size: 13.5px; opacity: 0.85; }
+
+  .tag {
+    display: inline-flex; align-items: center; font-size: 12.5px; padding: 6px 14px;
+    border: 1.5px solid var(--ink); border-radius: 999px; font-weight: 600;
   }
-  .btn-ghost:hover { border-color: var(--ink-soft); }
+
+  .field label { display: block; font-size: 12.5px; margin-bottom: 5px; font-weight: 600; }
+  .input {
+    width: 100%; min-height: 42px; padding: 9px 12px; font-size: 14px; color: var(--ink);
+    background: #ffffff; border: 2px solid var(--ink); border-radius: 4px;
+    font-family: inherit;
+  }
+  .field.error .input { border-color: #B00020; }
+  .field .error-msg { display: none; font-size: 12px; color: #B00020; margin-top: 4px; font-weight: 600; }
+  .field.error .error-msg { display: block; }
+
+  /* Nav */
+  .nav {
+    display: flex; align-items: center; gap: 28px; padding: 20px 24px;
+    flex-wrap: wrap;
+  }
+  .nav-brand { font-weight: 800; font-size: 20px; margin-right: auto; }
+  .nav-links { display: flex; gap: 22px; align-items: center; }
+  .nav-links a { text-decoration: none; font-weight: 500; font-size: 14.5px; }
+  @media (max-width: 720px) {
+    .nav-links a:not(.btn) { display: none; }
+  }
 
   /* Hero */
-  .hero {
-    padding: 76px 0 56px;
-  }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 56px;
-    align-items: start;
-  }
-  @media (max-width: 860px) {
-    .hero-grid { grid-template-columns: 1fr; }
-  }
+  .hero { padding: 48px 24px 44px; }
+  .hero-inner { max-width: 680px; }
   .hero h1 {
-    font-size: clamp(34px, 4.6vw, 52px);
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    font-size: clamp(32px, 5.5vw, 56px);
+    line-height: 1.08; letter-spacing: -0.015em; margin: 0; font-weight: 800;
   }
-  .hero .accent-word { color: var(--accent-strong); }
   .hero p.lede {
-    font-size: 18px;
-    color: var(--ink-soft);
-    max-width: 46ch;
-    margin-top: 18px;
+    font-size: clamp(15px, 1.6vw, 17px); line-height: 1.6; opacity: 0.85;
+    max-width: 52ch; margin: 20px 0 0;
   }
-  .hero-actions {
-    display: flex;
-    gap: 14px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-  }
-  .hero-fineprint {
-    margin-top: 14px;
-    font-size: 13px;
-    color: var(--ink-soft);
-  }
+  .hero-actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
 
-  /* Trust panel - ledger card */
-  .ledger {
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .ledger-head {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .ledger-head .mono { font-size: 12px; color: var(--ink-soft); }
-  .ledger-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 13px 20px;
-    border-bottom: 1px solid var(--line-soft);
-    font-size: 14px;
-  }
-  .ledger-row:last-child { border-bottom: none; }
-  .ledger-row .k { color: var(--ink-soft); }
-  .ledger-row .v { text-align: right; font-weight: 500; }
-  .ledger-row .v.ok { color: var(--accent-strong); }
+  /* Tag band */
+  .tag-band { background: #000000; padding: 32px 24px; }
+  .tag-band-inner { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .tag-band .tag { color: var(--bg); border-color: var(--bg); }
 
   /* Sections */
-  section { padding: 64px 0; }
-  section.tight { padding: 48px 0; }
-  .section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px;
-    margin-bottom: 36px;
-    flex-wrap: wrap;
-  }
-  .section-head h2 { font-size: clamp(26px, 3vw, 34px); margin-top: 8px; max-width: 24ch; }
-  .section-head p { color: var(--ink-soft); max-width: 42ch; font-size: 15px; margin: 0; }
-
-  /* Problem list */
-  .problem-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  @media (max-width: 780px) { .problem-grid { grid-template-columns: 1fr; } }
-  .problem-item {
-    background: var(--paper-raised);
-    padding: 26px 24px;
-  }
-  .problem-item .num { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-soft); }
-  .problem-item h3 { font-size: 18px; margin-top: 10px; font-weight: 500; }
-  .problem-item p { font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
-
-  /* Steps (real sequence) */
-  .steps { display: flex; flex-direction: column; }
-  .step {
-    display: grid;
-    grid-template-columns: 64px 1fr 1.1fr;
-    gap: 28px;
-    padding: 28px 0;
-    border-bottom: 1px solid var(--line);
-    align-items: start;
-  }
-  .step:first-child { border-top: 1px solid var(--line); }
+  section.pg-section { padding: 44px 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   @media (max-width: 780px) {
-    .step { grid-template-columns: 44px 1fr; }
-    .step .step-visual { display: none; }
+    .grid-3, .grid-2 { grid-template-columns: 1fr; }
   }
-  .step .num {
-    font-family: 'Fraunces', serif;
-    font-size: 26px;
-    color: var(--line);
-    font-weight: 500;
-  }
-  .step h3 { font-size: 19px; }
-  .step p { color: var(--ink-soft); font-size: 14.5px; margin-top: 8px; max-width: 48ch; }
-  .step-visual {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12.5px;
-    background: var(--accent-soft);
-    border-radius: 4px;
-    padding: 14px 16px;
-    color: var(--accent-strong);
-    align-self: stretch;
-    display: flex;
-    align-items: center;
-  }
+  .step-num { font-size: 14px; font-weight: 800; margin: 0 0 8px; }
+  .step h3 { font-size: 19px; margin: 0 0 6px; font-weight: 700; }
+  .step p { font-size: 14.5px; line-height: 1.6; opacity: 0.85; margin: 0; }
 
-  /* Trust commitments */
-  .commit-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  @media (max-width: 780px) { .commit-grid { grid-template-columns: 1fr; } }
-  .commit {
-    display: flex;
-    gap: 14px;
-    padding: 22px 0;
-    border-top: 1px solid var(--line);
-  }
-  .commit .glyph {
-    flex-shrink: 0;
-    width: 22px; height: 22px;
-    border: 1.5px solid var(--accent-strong);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent-strong);
-    font-size: 12px;
-    margin-top: 2px;
-  }
-  .commit h3 { font-size: 15.5px; font-weight: 600; }
-  .commit p { font-size: 13.5px; color: var(--ink-soft); margin-top: 5px; }
+  .faq-item { padding: 18px 0; border-bottom: 1px solid var(--divider); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-item h3 { font-size: 16px; margin: 0 0 6px; font-weight: 700; }
+  .faq-item p { font-size: 14.5px; opacity: 0.85; margin: 0; }
 
-  /* Founder note */
-  .founder-note {
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--accent-strong);
-    border-radius: 3px;
-    padding: 32px 34px;
-  }
-  .founder-note p { font-size: 16.5px; line-height: 1.65; margin: 0 0 14px; max-width: 62ch; }
-  .founder-note p:last-of-type { margin-bottom: 0; }
-  .founder-sig {
-    margin-top: 22px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 13.5px;
-    color: var(--ink-soft);
-  }
-  .founder-sig .name { color: var(--ink); font-weight: 600; }
+  /* Contact / form section */
+  .contact-section { background: #000000; padding: 48px 24px; color: #ffffff; }
+  .contact-section h3 { font-size: clamp(20px, 3vw, 23px); margin: 0 0 8px; color: var(--bg); font-weight: 700; }
+  .contact-section p.lede { font-size: 14.5px; opacity: 0.85; margin: 0 0 24px; max-width: 52ch; color: #ffffff; }
+  .contact-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 640px; }
+  @media (max-width: 560px) { .contact-form { grid-template-columns: 1fr; } }
+  .contact-form label { color: #ffffff; }
+  .contact-btn { color: var(--bg); border-color: var(--bg); margin-top: 18px; }
+  .form-status { margin-top: 14px; font-size: 13.5px; font-weight: 600; display: none; }
+  .form-status.show { display: block; }
+  .form-status.success { color: var(--bg); }
+  .form-status.error { color: #ff6b6b; }
 
-  /* Pricing */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-  @media (max-width: 780px) { .pricing-grid { grid-template-columns: 1fr; } }
-  .price-card {
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 30px 28px;
-    display: flex;
-    flex-direction: column;
-  }
-  .price-card.featured { border-color: var(--accent-strong); box-shadow: 0 0 0 1px var(--accent-strong); }
-  .price-card .tag { font-size: 12.5px; color: var(--ink-soft); }
-  .price-card .amount {
-    font-family: 'Fraunces', serif;
-    font-size: 40px;
-    margin-top: 10px;
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-  }
-  .price-card .amount .per { font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--ink-soft); }
-  .price-card ul { list-style: none; padding: 0; margin: 22px 0; display: flex; flex-direction: column; gap: 10px; }
-  .price-card li { font-size: 14px; display: flex; gap: 10px; color: var(--ink); }
-  .price-card li::before { content: "—"; color: var(--ink-soft); }
-  .price-card .btn { margin-top: auto; justify-content: center; }
-  .price-note { font-size: 12.5px; color: var(--ink-soft); margin-top: 12px; text-align: center; }
-
-  /* FAQ */
-  .faq-item {
-    border-top: 1px solid var(--line);
-    padding: 22px 0;
-  }
-  .faq-item:last-child { border-bottom: 1px solid var(--line); }
-  .faq-item h3 { font-size: 16px; font-weight: 600; }
-  .faq-item p { font-size: 14.5px; color: var(--ink-soft); margin-top: 8px; max-width: 62ch; }
-
-  /* Placeholder callout */
-  .placeholder-note {
-    background: var(--warn-bg);
-    color: var(--warn-ink);
-    border-radius: 4px;
-    padding: 16px 20px;
-    font-size: 13.5px;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .placeholder-note .mono { font-size: 12px; }
-
-  /* CTA band */
-  .cta-band {
-    background: var(--accent-strong);
-    border-radius: 6px;
-    padding: 48px 44px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .cta-band h2 { color: #F4F6F3; font-size: clamp(24px,3vw,30px); max-width: 22ch; }
-  .cta-band p { color: #CFE4D9; font-size: 14.5px; margin-top: 8px; }
-  .cta-band .btn-primary { background: #F4F6F3; color: var(--accent-strong); }
-  .cta-band .btn-primary:hover { background: #FFFFFF; }
-
-  /* Footer */
   footer.site {
-    border-top: 1px solid var(--line);
-    padding: 40px 0 60px;
+    padding: 24px; font-size: 13px; opacity: 0.85;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   }
-  .footer-grid {
-    display: flex;
-    justify-content: space-between;
-    gap: 24px;
-    flex-wrap: wrap;
-    font-size: 13px;
-    color: var(--ink-soft);
-  }
-  .footer-grid a { color: var(--ink-soft); text-decoration: none; }
-  .footer-grid a:hover { color: var(--ink); }
-  .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
-  .footer-legal { margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; }
+  footer.site .footer-links { display: flex; gap: 18px; flex-wrap: wrap; }
+  footer.site a { text-decoration: none; }
+  footer.site a:hover { text-decoration: underline; }
 
-  strong.hl { color: var(--accent-strong); font-weight: 600; }
+  @media (min-width: 860px) {
+    .nav, .hero, .tag-band, section.pg-section, .contact-section, footer.site {
+      padding-left: 56px; padding-right: 56px;
+    }
+  }
 </style>
+</head>
+<body>
 
-<header class="site">
-  <div class="wrap site-nav">
-    <div class="logo"><span class="mark"></span>Buscador</div>
-    <nav class="links">
+<div class="wrap">
+  <nav class="nav">
+    <span class="nav-brand">ProspectGreen</span>
+    <div class="nav-links">
       <a href="#como-funciona">Como funciona</a>
-      <a href="#confianca">Transparência</a>
-      <a href="#preco">Preço</a>
-      <a href="#faq">Perguntas</a>
-    </nav>
-    <div class="nav-actions">
-      <a href="#preco" class="btn btn-ghost">Ver preço</a>
-      <a href="#preco" class="btn btn-primary">Testar grátis</a>
+      <a href="#beneficios">Benefícios</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contato" class="btn">Agendar reunião</a>
     </div>
-  </div>
-</header>
+  </nav>
 
-<main>
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <p class="eyebrow">Prospecção B2B · dados públicos verificáveis</p>
-        <h1>Encontre empresas de verdade.<br>Sem números <span class="accent-word">inflados</span>.</h1>
-        <p class="lede">Buscador cruza CNAE, cidade e porte com o cadastro público de CNPJs para te dar uma lista de empresas real — sem alegar milhões de contatos ocultos nem promessas de "IA que fecha venda sozinha".</p>
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>Reduza a conta de energia da sua empresa sem investimento inicial</h1>
+        <p class="lede">A ProspectGreen conecta empresas ao mercado livre de energia e à geração distribuída — desconto na fatura todo mês, com placas solares ou usinas parceiras, sem obra no seu imóvel.</p>
         <div class="hero-actions">
-          <a href="#preco" class="btn btn-primary">Começar teste grátis de 7 dias</a>
-          <a href="#como-funciona" class="btn btn-ghost">Ver como funciona</a>
+          <a href="#contato" class="btn">Agendar uma call</a>
+          <a href="#contato" class="btn btn-ghost">Falar com um consultor</a>
         </div>
-        <p class="hero-fineprint">Sem cartão de crédito para testar. Cancele quando quiser, direto no painel.</p>
       </div>
-      <div class="ledger">
-        <div class="ledger-head">
-          <span>Ficha do produto</span>
-          <span class="mono">v1.0 · MVP</span>
-        </div>
-        <div class="ledger-row"><span class="k">Fonte dos dados</span><span class="v">Receita Federal (CNPJ público)</span></div>
-        <div class="ledger-row"><span class="k">Clientes ativos hoje</span><span class="v">Somos novos — você seria um dos primeiros</span></div>
-        <div class="ledger-row"><span class="k">Envio de mensagens</span><span class="v">Só pelo seu próprio WhatsApp, com sua permissão</span></div>
-        <div class="ledger-row"><span class="k">Cobrança</span><span class="v">Mensal, cancelável a qualquer momento</span></div>
-        <div class="ledger-row"><span class="k">Dados protegidos</span><span class="v ok">Conforme a LGPD</span></div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <hr class="rule">
-
-  <section class="tight">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">O problema</p>
-          <h2>Prospectar hoje ainda é garimpo manual</h2>
-        </div>
-        <p>A maior parte do tempo de um vendedor não vai para vender — vai para descobrir quem ligar.</p>
+    <section class="tag-band">
+      <div class="tag-band-inner">
+        <div class="tag">Sem obra</div>
+        <div class="tag">Sem investimento inicial</div>
+        <div class="tag">Contrato sem fidelidade longa</div>
+        <div class="tag">Homologação incluída</div>
       </div>
-      <div class="problem-grid">
-        <div class="problem-item">
-          <p class="num mono">01</p>
-          <h3>Buscas espalhadas</h3>
-          <p>Google, Instagram, indicação — cada canal dá um pedaço da informação, nenhum dá o quadro todo.</p>
-        </div>
-        <div class="problem-item">
-          <p class="num mono">02</p>
-          <h3>Dados desatualizados</h3>
-          <p>Telefones que não existem mais, empresas fechadas, endereços trocados — tempo perdido em contato morto.</p>
-        </div>
-        <div class="problem-item">
-          <p class="num mono">03</p>
-          <h3>Nenhum critério de filtro</h3>
-          <p>Sem CNAE, porte ou localização certos, a lista vira volume sem qualidade — e a taxa de resposta cai.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <hr class="rule">
-
-  <section id="como-funciona">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Como funciona</p>
-          <h2>Três etapas, sem promessa de piloto automático</h2>
-        </div>
-        <p>O Buscador organiza a busca e a exportação. A conversa com o lead continua sendo sua — por escolha, não por limitação escondida.</p>
-      </div>
-      <div class="steps">
+    <section id="como-funciona" class="pg-section">
+      <p class="pg-kicker">Como funciona</p>
+      <div class="grid-3">
         <div class="step">
-          <span class="num mono">01</span>
-          <div>
-            <h3>Filtre por CNAE, cidade e porte</h3>
-            <p>Escolha o segmento (ex: 47.11-3-02 — comércio varejista) e a região. O resultado é uma lista de empresas ativas no cadastro público, não um banco genérico.</p>
-          </div>
-          <div class="step-visual">CNAE 47.11-3-02 · Curitiba/PR · ME e EPP</div>
+          <p class="step-num">01</p>
+          <h3>Diagnóstico gratuito</h3>
+          <p>Analisamos sua fatura de energia e simulamos a economia possível para o seu perfil de consumo.</p>
         </div>
         <div class="step">
-          <span class="num mono">02</span>
-          <div>
-            <h3>Enriqueça com o que existe de fato</h3>
-            <p>Situação cadastral, capital social, data de abertura, telefone e e-mail — quando constam na fonte pública. Campo vazio aparece vazio, nunca preenchido com dado inventado.</p>
-          </div>
-          <div class="step-visual">status: ATIVA · aberta em 2019 · capital: R$ 50.000</div>
+          <p class="step-num">02</p>
+          <h3>Contratação e homologação</h3>
+          <p>Cuidamos da migração para o mercado livre ou da conexão com a usina de geração distribuída.</p>
         </div>
         <div class="step">
-          <span class="num mono">03</span>
-          <div>
-            <h3>Exporte e aborde do seu jeito</h3>
-            <p>CSV, planilha ou integração com seu CRM. Modelos de mensagem prontos como ponto de partida — você edita e envia pela sua própria conta.</p>
-          </div>
-          <div class="step-visual">export.csv · 212 empresas · pronto para importar</div>
+          <p class="step-num">03</p>
+          <h3>Desconto todo mês</h3>
+          <p>O desconto aparece direto na sua fatura, sem trocar de distribuidora nem instalar nada no local.</p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <hr class="rule">
+    <hr class="pg-rule">
 
-  <section id="confianca">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Transparência</p>
-          <h2>O que prometemos — e o que não prometemos</h2>
+    <section id="beneficios" class="pg-section">
+      <p class="pg-kicker">Benefícios</p>
+      <div class="grid-2">
+        <div class="card">
+          <p class="card-title">Energia solar sem obra</p>
+          <p class="card-body">Acesso a placas solares e usinas de geração distribuída sem instalar nada no seu imóvel.</p>
         </div>
-        <p>Não temos casos de sucesso pra mostrar ainda. Preferimos dizer isso a inventar depoimento.</p>
-      </div>
-      <div class="commit-grid">
-        <div class="commit">
-          <span class="glyph">✓</span>
-          <div>
-            <h3>Só usamos fonte pública e citada</h3>
-            <p>Todo dado de empresa vem do cadastro nacional de CNPJ. Nada é raspado de redes sociais sem indicação da origem.</p>
-          </div>
+        <div class="card">
+          <p class="card-title">Mercado livre de energia</p>
+          <p class="card-body">Compra de energia com preços negociados, fora da tarifa regulada da distribuidora local.</p>
         </div>
-        <div class="commit">
-          <span class="glyph">✓</span>
-          <div>
-            <h3>Sem envio automático em massa</h3>
-            <p>O Buscador não dispara mensagens sozinho. Toda abordagem parte da sua conta, com seu consentimento, etapa por etapa.</p>
-          </div>
+        <div class="card">
+          <p class="card-title">Sustentabilidade</p>
+          <p class="card-body">Energia limpa para a sua operação, com relatório de impacto ambiental disponível.</p>
         </div>
-        <div class="commit">
-          <span class="glyph">✓</span>
-          <div>
-            <h3>Cancelamento em um clique</h3>
-            <p>Sem ligação, sem retenção por chat. O botão de cancelar fica no mesmo painel onde você assinou.</p>
-          </div>
-        </div>
-        <div class="commit">
-          <span class="glyph">✓</span>
-          <div>
-            <h3>Nenhuma estatística inventada</h3>
-            <p>Não vamos afirmar "50 milhões de empresas" ou "conversão de 70%" sem poder mostrar de onde o número saiu.</p>
-          </div>
+        <div class="card">
+          <p class="card-title">Atendimento consultivo</p>
+          <p class="card-body">Um consultor acompanha da simulação até a ativação, sem letras miúdas no contrato.</p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <hr class="rule">
+    <hr class="pg-rule">
 
-  <section class="tight">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Por que existimos</p>
-          <h2>Uma nota direta, sem departamento de marketing</h2>
-        </div>
+    <section id="faq" class="pg-section">
+      <p class="pg-kicker">Perguntas frequentes</p>
+      <div class="faq-item">
+        <h3>Preciso instalar placas solares na minha empresa?</h3>
+        <p>Não. A geração distribuída permite usar energia de usinas parceiras — o desconto chega na sua fatura sem obra no local.</p>
       </div>
-      <div class="founder-note">
-        <p>O Buscador começou porque cansamos de ver ferramentas de prospecção venderem números que não se sustentam — "milhões de leads", "IA que fecha sozinha" — pra depois entregar uma planilha desatualizada.</p>
-        <p>Estamos no começo. Isso significa que o produto ainda tem menos recursos que os concorrentes que prometem tudo. Em troca, cada dado que você vê aqui é <strong class="hl">verificável na fonte oficial</strong>, e cada funcionalidade listada já existe — nenhuma está "em breve" disfarçada de pronta.</p>
-        <div class="founder-sig">
-          <span class="name">Equipe Buscador</span>
-          <span class="mono">— [nome@buscador.com.br]</span>
-        </div>
+      <div class="faq-item">
+        <h3>Minha empresa muda de distribuidora?</h3>
+        <p>Não. A distribuidora e a rede continuam as mesmas — só muda a origem da energia e o valor cobrado.</p>
       </div>
-    </div>
-  </section>
+      <div class="faq-item">
+        <h3>Qualquer porte de empresa pode contratar?</h3>
+        <p>Sim. Atendemos empresas de todos os portes — o consultor indica o melhor modelo para o seu consumo.</p>
+      </div>
+    </section>
 
-  <hr class="rule">
+    <section id="contato" class="contact-section">
+      <h3>Fale com um consultor</h3>
+      <p class="lede">Deixe seus dados e agendamos uma call para simular a economia da sua empresa.</p>
+      <form class="contact-form" id="lead-form" novalidate>
+        <div class="field" id="field-nome">
+          <label for="nome">Nome</label>
+          <input class="input" type="text" id="nome" name="nome" placeholder="Seu nome" required>
+          <p class="error-msg">Informe seu nome.</p>
+        </div>
+        <div class="field" id="field-empresa">
+          <label for="empresa">Empresa</label>
+          <input class="input" type="text" id="empresa" name="empresa" placeholder="Nome da empresa" required>
+          <p class="error-msg">Informe o nome da empresa.</p>
+        </div>
+        <div class="field" id="field-email">
+          <label for="email">E-mail</label>
+          <input class="input" type="email" id="email" name="email" placeholder="voce@empresa.com.br" required>
+          <p class="error-msg">Informe um e-mail válido.</p>
+        </div>
+        <div class="field" id="field-telefone">
+          <label for="telefone">Telefone</label>
+          <input class="input" type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required>
+          <p class="error-msg">Informe um telefone válido.</p>
+        </div>
+      </form>
+      <button type="submit" form="lead-form" class="btn contact-btn">Agendar reunião</button>
+      <p class="form-status" id="form-status"></p>
+    </section>
+  </main>
 
-  <section id="preco">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Preço</p>
-          <h2>Um plano, sem letra miúda</h2>
-        </div>
-        <p>Teste 7 dias de graça. Se não fizer sentido pro seu processo comercial, cancele — sem perguntas.</p>
-      </div>
-      <div class="pricing-grid">
-        <div class="price-card">
-          <span class="tag">Teste</span>
-          <div class="amount">R$ 0<span class="per">/ 7 dias</span></div>
-          <ul>
-            <li>Até 100 empresas exportadas</li>
-            <li>Filtros de CNAE, cidade e porte</li>
-            <li>Modelos de mensagem inclusos</li>
-            <li>Sem cartão de crédito</li>
-          </ul>
-          <a href="#" class="btn btn-ghost">Começar teste</a>
-        </div>
-        <div class="price-card featured">
-          <span class="tag">Assinatura mensal</span>
-          <div class="amount mono">R$ [97]<span class="per">/mês</span></div>
-          <ul>
-            <li>Exportações ilimitadas</li>
-            <li>Enriquecimento completo dos dados públicos</li>
-            <li>Integração com CRM (CSV / API)</li>
-            <li>Cancele quando quiser, sem multa</li>
-          </ul>
-          <a href="#" class="btn btn-primary">Assinar Buscador</a>
-        </div>
-      </div>
-      <p class="price-note">Preço de lançamento sujeito a ajuste com aviso prévio de 30 dias aos assinantes ativos.</p>
-    </div>
-  </section>
+  <footer class="site">
+    <span>© 2026 ProspectGreen · prospectgreen.com.br</span>
+    <span class="footer-links">
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#beneficios">Benefícios</a>
+      <a href="#faq">FAQ</a>
+    </span>
+  </footer>
+</div>
 
-  <hr class="rule">
+<script>
+  (function () {
+    var form = document.getElementById('lead-form');
+    var status = document.getElementById('form-status');
+    var phonePattern = /^(\(\d{2}\)|\d{2})[\s-]?\d{4,5}-?\d{4}$/;
 
-  <section id="faq">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Perguntas frequentes</p>
-          <h2>Direto ao ponto</h2>
-        </div>
-      </div>
-      <div class="faq-list">
-        <div class="faq-item">
-          <h3>Vocês já têm clientes usando?</h3>
-          <p>Ainda não temos uma base de clientes para citar — o produto acabou de sair do teste interno. Preferimos dizer isso claramente a mostrar depoimentos genéricos.</p>
-        </div>
-        <div class="faq-item">
-          <h3>De onde vêm os dados das empresas?</h3>
-          <p>Do cadastro público de CNPJ mantido pela Receita Federal. Não compramos base de terceiros nem fazemos scraping de redes sociais para preencher campos de contato.</p>
-        </div>
-        <div class="faq-item">
-          <h3>O Buscador envia mensagens sozinho?</h3>
-          <p>Não. Ele monta a lista e sugere modelos de mensagem. O envio acontece pela sua própria conta de WhatsApp ou e-mail, sob seu controle.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Posso cancelar quando quiser?</h3>
-          <p>Sim. O cancelamento é self-service, sem período mínimo de fidelidade e sem necessidade de contato com suporte para efetivar.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Como meus dados são protegidos?</h3>
-          <p>Seguimos a LGPD: você pode solicitar exportação ou exclusão dos seus dados de conta a qualquer momento pelo e-mail de suporte.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    function setError(fieldId, hasError) {
+      document.getElementById(fieldId).classList.toggle('error', hasError);
+    }
 
-  <section class="tight">
-    <div class="wrap">
-      <div class="placeholder-note">
-        <span class="mono">⚠</span>
-        <span>Nota de implementação (remova antes de publicar): substitua os campos entre colchetes — preço, e-mail, CNPJ e razão social — pelos dados reais do seu negócio antes de colocar esta página no ar.</span>
-      </div>
-    </div>
-  </section>
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
 
-  <section class="tight">
-    <div class="wrap">
-      <div class="cta-band">
-        <div>
-          <h2>Pronto pra testar sem compromisso?</h2>
-          <p>7 dias grátis. Sem cartão. Cancele quando quiser.</p>
-        </div>
-        <a href="#preco" class="btn btn-primary">Começar teste grátis</a>
-      </div>
-    </div>
-  </section>
-</main>
+      var nome = form.nome.value.trim();
+      var empresa = form.empresa.value.trim();
+      var email = form.email.value.trim();
+      var telefone = form.telefone.value.trim();
 
-<footer class="site">
-  <div class="wrap">
-    <div class="footer-grid">
-      <div>
-        <div class="logo" style="font-size:16px;"><span class="mark"></span>Buscador</div>
-        <p class="footer-legal">[Razão Social LTDA] — CNPJ [00.000.000/0000-00]<br>© 2026 Buscador. Todos os direitos reservados.</p>
-      </div>
-      <div class="footer-links">
-        <a href="#">Termos de uso</a>
-        <a href="#">Política de privacidade</a>
-        <a href="mailto:contato@buscador.com.br">Suporte</a>
-      </div>
-    </div>
-  </div>
-</footer>
+      var nomeOk = nome.length > 0;
+      var empresaOk = empresa.length > 0;
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      var telefoneOk = phonePattern.test(telefone);
+
+      setError('field-nome', !nomeOk);
+      setError('field-empresa', !empresaOk);
+      setError('field-email', !emailOk);
+      setError('field-telefone', !telefoneOk);
+
+      status.className = 'form-status show';
+
+      if (nomeOk && empresaOk && emailOk && telefoneOk) {
+        // TODO: enviar para o CRM/backend de leads.
+        status.classList.add('success');
+        status.classList.remove('error');
+        status.textContent = 'Recebemos seus dados. Em breve um consultor entra em contato.';
+        form.reset();
+      } else {
+        status.classList.add('error');
+        status.classList.remove('success');
+        status.textContent = 'Confira os campos destacados e tente novamente.';
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
