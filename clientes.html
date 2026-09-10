@@ -139,6 +139,12 @@
       <div class="filters">
         <select id="filtro-estado"><option value="">Estado (todos)</option></select>
         <select id="filtro-cidade"><option value="">Cidade (todas)</option></select>
+        <select id="filtro-confianca">
+          <option value="">Confiança (todas)</option>
+          <option value="alta">Confiança alta</option>
+          <option value="media">Confiança média</option>
+          <option value="baixa">Confiança baixa</option>
+        </select>
         <input type="search" id="busca" placeholder="Buscar empresa ou CNPJ…">
       </div>
     </div>
@@ -185,6 +191,7 @@
     categoriaAtiva: "",
     estado: "",
     cidade: "",
+    confianca: "",
     busca: "",
     ordenarPor: "empresa",
     ordemAsc: true
@@ -199,7 +206,8 @@
     cidade: ["cidade", "municipio"],
     estado: ["estado", "uf"],
     endereco: ["endereco", "logradouro"],
-    categoria: ["categoria", "status", "situacao"]
+    categoria: ["categoria", "status", "situacao"],
+    confianca: ["confianca_match", "confianca", "confidence"]
   };
 
   function normKey(s) { return (s || "").toString().trim().toLowerCase().replace(/[^a-z0-9]/g, "_"); }
@@ -227,6 +235,15 @@
     return "nao-migrado";
   }
 
+  function inferConfianca(row) {
+    var raw = normKey(findField(row, FIELD_ALIASES.confianca));
+    if (!raw) return "";
+    if (raw.indexOf("alta") >= 0) return "alta";
+    if (raw.indexOf("media") >= 0) return "media";
+    if (raw.indexOf("baixa") >= 0) return "baixa";
+    return "";
+  }
+
   function normalizeRow(raw) {
     var empresa = findField(raw, FIELD_ALIASES.empresa);
     var cidade = findField(raw, FIELD_ALIASES.cidade);
@@ -243,6 +260,7 @@
       estado: estado,
       localizacao: loc,
       categoria: inferCategoria(raw),
+      confianca: inferConfianca(raw),
       _raw: raw
     };
   }
@@ -308,6 +326,7 @@
       if (state.categoriaAtiva && d.categoria !== state.categoriaAtiva) return false;
       if (state.estado && d.estado !== state.estado) return false;
       if (state.cidade && d.cidade !== state.cidade) return false;
+      if (state.confianca && d.confianca !== state.confianca) return false;
       if (termo && d.empresa.toLowerCase().indexOf(termo) < 0 && d.cnpj.toLowerCase().indexOf(termo) < 0) return false;
       return true;
     });
@@ -378,6 +397,7 @@
 
   document.getElementById("filtro-estado").addEventListener("change", function (e) { state.estado = e.target.value; render(); });
   document.getElementById("filtro-cidade").addEventListener("change", function (e) { state.cidade = e.target.value; render(); });
+  document.getElementById("filtro-confianca").addEventListener("change", function (e) { state.confianca = e.target.value; render(); });
   document.getElementById("busca").addEventListener("input", function (e) { state.busca = e.target.value; renderTabela(); });
 
   document.querySelectorAll("thead th").forEach(function (th) {
