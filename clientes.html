@@ -113,9 +113,40 @@
     .filters { margin-left: 0; width: 100%; }
     .modal dl { grid-template-columns: 1fr; }
   }
+
+  /* Gate de acesso */
+  #gate {
+    position: fixed; inset: 0; background: var(--bg); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  #gate.unlocked { display: none; }
+  .gate-box {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 32px; max-width: 360px; width: 100%; text-align: center;
+  }
+  .gate-box h2 { margin: 0 0 8px; font-size: 18px; }
+  .gate-box p { color: var(--ink-soft); font-size: 13px; margin: 0 0 18px; }
+  .gate-box input { width: 100%; margin-bottom: 12px; text-align: center; }
+  .gate-box button {
+    width: 100%; background: var(--accent); color: var(--accent-ink); border: none;
+    border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .gate-error { color: var(--danger); font-size: 12.5px; margin-top: 10px; display: none; }
 </style>
 </head>
 <body>
+
+<div id="gate">
+  <div class="gate-box">
+    <h2>Área interna</h2>
+    <p>Acesso restrito — dados de clientes ProspectGreen.</p>
+    <form id="gate-form">
+      <input type="password" id="gate-senha" placeholder="Senha" autofocus>
+      <button type="submit">Entrar</button>
+      <p class="gate-error" id="gate-error">Senha incorreta.</p>
+    </form>
+  </div>
+</div>
 
 <header class="top">
   <div class="wrap">
@@ -178,6 +209,24 @@
 </div>
 
 <script>
+(function () {
+  var SENHA_ACESSO = "prospectgreen2026";
+  var gate = document.getElementById("gate");
+  if (sessionStorage.getItem("pg_clientes_ok") === "1") {
+    gate.classList.add("unlocked");
+  }
+  document.getElementById("gate-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var valor = document.getElementById("gate-senha").value;
+    if (valor === SENHA_ACESSO) {
+      sessionStorage.setItem("pg_clientes_ok", "1");
+      gate.classList.add("unlocked");
+    } else {
+      document.getElementById("gate-error").style.display = "block";
+    }
+  });
+})();
+
 (function () {
   var CATEGORIAS = [
     { key: "", label: "Todos" },
